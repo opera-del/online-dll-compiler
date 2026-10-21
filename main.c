@@ -1,28 +1,27 @@
-// framepacer_bypass.c
+// framepacer_bypass.h
 #include <windows.h>
 
 extern "C" {
 
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
-{
-    switch (ul_reason_for_call)
-    {
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved);
 
-  Thought for 4s
+// Stub function (if needed)
+__declspec(dllexport) void DisableNotifyOnExit(BOOL enable);
 
-A DLL intercept approach: FramePacer loads framepacer64.dll on launch. We'll drop a stub that skips the Steam check.
+} // extern "C"
+
+cl /LD framepacer_bypass.h /Fe:my_library.dll
+
+3. If you want a C-style .c module, drop the extern "C":
 
 // framepacer_bypass.c
 #include <windows.h>
-
-extern "C" {
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
     switch (ul_reason_for_call)
     {
         case DLL_PROCESS_ATTACH:
-            // Skip the Steam-only check on launch
             DisableNotifyOnExit(TRUE);
             break;
         case DLL_THREAD_ATTACH:
@@ -33,10 +32,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     return TRUE;
 }
 
-// Stub the blocking function (if present in this version)
 __declspec(dllexport) void DisableNotifyOnExit(BOOL enable)
 {
-    // No-op: Steam check is bypassed by DllMain
+    // no-op
 }
-
-} // extern "C"
