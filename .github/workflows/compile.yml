@@ -1,0 +1,24 @@
+name: Compile C Code to DLL
+
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup Developer Command Prompt
+      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Compile to DLL
+      run: |
+        cl.exe /LD main.c /Fe:my_library.dll
+
+    - name: Upload DLL Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Compiled-Windows-DLL
+        path: my_library.dll
